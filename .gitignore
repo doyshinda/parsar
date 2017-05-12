@@ -1,3 +1,5 @@
 cythonize.py
 cparsar.c
+*.so
+*.pyc
 build
