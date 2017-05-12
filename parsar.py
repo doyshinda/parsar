@@ -20,6 +20,7 @@ class Parsar(object):
     def __init__(self, filename):
         self.filename = filename
 
+    # pylint: disable=E1101
     def cpu(self, stats=DEFAULT_CPU_STATS):
         return cparsar.parsefile(self.filename, CPU, stats, key='all')
 
@@ -43,6 +44,7 @@ def main(args):
         stats = args.diskstats or DEFAULT_DISK_STATS
         result = p.disk(args.diskdev, stats=stats)
 
+    # TODO: Handle broken pipe (i.e., piping output into head)
     for r in result:
         print r
 

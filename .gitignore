@@ -1,4 +1,3 @@
 cythonize.py
 cparsar.c
-cparsar.pyx
 build
