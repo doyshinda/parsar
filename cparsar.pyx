@@ -4,6 +4,11 @@ import re
 import sys
 
 
+class FileNotFound(Exception):
+    """Exception raised when sar file isn't found"""
+    pass
+
+
 def format_time(startdate, timestr, afternoon):
     """format the timstr as a datetime str"""
     timedate = datetime.strptime('%s %s %s' % (startdate, timestr, afternoon),
@@ -19,8 +24,7 @@ def parsefile(filename, section, stats, key=''):
     regex = re.compile(r'\s+')
 
     if not os.path.exists(filename):
-        print 'file "%s" does not exist' % filename
-        sys.exit(1)
+        raise FileNotFound('file "%s" does not exist' % filename)
 
     def getstatsline():
         retstr = format_time(startdate, vals[0], vals[1])
