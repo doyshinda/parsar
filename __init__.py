@@ -1,1 +1,1 @@
-from parsar import Parsar
+from .parsar import Parsar

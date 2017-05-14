@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 import argparse
-import cparsar
+from . import cparsar
 
 
 DEFAULT_CPU_STATS = ['%idle']
@@ -68,8 +67,4 @@ def main():
 
     # TODO: Handle broken pipe (i.e., piping output into head)
     for r in result:
-        print r
-
-
-if __name__ == '__main__':
-    main()
+        print(r)
