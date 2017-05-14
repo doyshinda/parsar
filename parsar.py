@@ -31,8 +31,30 @@ class Parsar(object):
         return cparsar.parsefile(self.filename, DISK, stats, key=devname)
 
 
-def main(args):
+def get_args():
+    """get command line arguments"""
+    parser = argparse.ArgumentParser(description='Parse SAR data')
+    subparsers = parser.add_subparsers(help='SAR Section of interest')
+
+    subparser = subparsers.add_parser('cpu', help='CPU stats')
+    subparser.add_argument('--cpustats', nargs='*')
+
+    subparser = subparsers.add_parser('mem', help='Memory stats')
+    subparser.add_argument('--memstats', nargs='*')
+
+    subparser = subparsers.add_parser('disk', help='Disk stats')
+    subparser.add_argument('--diskdev', required=True,
+                           help='desired disk device')
+    subparser.add_argument('--diskstats', nargs='+',
+                           help='default: %s' % DEFAULT_DISK_STATS[0])
+
+    parser.add_argument('filename', help='the SAR file to parse')
+    return parser.parse_args()
+
+
+def main():
     """main entry point"""
+    args = get_args()
     p = Parsar(args.filename)
     if hasattr(args, 'cpustats'):
         stats = args.cpustats or DEFAULT_CPU_STATS
@@ -50,20 +72,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Parse SAR data')
-    subparsers = parser.add_subparsers(help='SAR Section of interest')
-
-    subparser = subparsers.add_parser('cpu', help='CPU stats')
-    subparser.add_argument('--cpustats', nargs='*')
-
-    subparser = subparsers.add_parser('mem', help='Memory stats')
-    subparser.add_argument('--memstats', nargs='*')
-
-    subparser = subparsers.add_parser('disk', help='Disk stats')
-    subparser.add_argument('--diskdev', required=True,
-                           help='desired disk device')
-    subparser.add_argument('--diskstats', nargs='+',
-                           help='default: %s' % DEFAULT_DISK_STATS[0])
-
-    parser.add_argument('filename', help='the SAR file to parse')
-    main(parser.parse_args())
+    main()
