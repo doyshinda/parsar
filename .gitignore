@@ -3,3 +3,6 @@ cparsar.c
 *.so
 *.pyc
 build
+dist
+parsar.egg-info
+
