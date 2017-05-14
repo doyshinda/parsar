@@ -1,18 +1,19 @@
-# ParSAR
+Parsar
+======
 
-ParSAR is a Python SAR parser designed to quickly and easily parse SAR data from plain-text SAR files.
-
-It can be run from either the command line:
+Parsar is a Python SAR parser designed to quickly and easily parse SAR data from plain-text SAR files.
+ 
+It can be run from either the command line::
 
     $ time ./parsar.py cpu sample.txt > /tmp/parsar.out
     real    0m0.579s
     user    0m0.552s
-    sys 0m0.008s
+    sys     0m0.008s
 
     $ wc -l /tmp/parsar.out
     7726 /tmp/parsar.out
-
-Or in Python code:
+ 
+Or in Python code::
 
     >>> import parsar
     >>> import time
@@ -26,7 +27,7 @@ Or in Python code:
     >>> getcpustats()
     Getting 7726 cpu stats took 0.57 seconds.
 
-And produces output that is easy for graphing tools to consume:
+And produces CSV output that is easy for graphing tools to consume::
 
     $ head -n 10 /tmp/parsar.out
     #Time,%idle
