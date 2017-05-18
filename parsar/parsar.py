@@ -68,3 +68,4 @@ def main():
     # TODO: Handle broken pipe (i.e., piping output into head)
     for r in result:
         print(r)
+
