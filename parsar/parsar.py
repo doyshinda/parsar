@@ -13,6 +13,44 @@ MEM = 'kbmemfree|kbmemused'
 DISK = 'DEV|tps'
 
 
+class FileNotFound(Exception):
+    """Exception raised when sar file isn't found"""
+    pass
+
+
+class IncompatibleFileType(Exception):
+    """Exception raised when parsar can't parse the file (most likely means
+    the user passed in the binary sa file)"""
+    pass
+
+
+class ParsarException(Exception):
+    """General catch all exception"""
+    pass
+
+
+def _try_parse(filename, section, stats, **kwargs):
+    """Attempt to parse the <filename>, raising appropriate
+    exception if it fails."""
+    try:
+        resp = cparsar.parsefile(filename, section, stats, **kwargs)
+
+        if isinstance(resp, list):
+            return resp
+
+        if resp == cparsar.ENOENT:
+            raise FileNotFound('file "%s" does not exist' % filename)
+        elif resp == cparsar.EMEDIUMTYPE:
+            msg = 'incompatible file detected, parsar requires SAR text ' \
+                  'files, perhaps "%s" is the binary version?'
+            raise IncompatibleFileType(msg % filename)
+        else:
+            raise ParsarException('Unexpected err code returned: "%s"' % resp)
+
+    except Exception as e:  # pylint: disable=W0703
+        raise ParsarException(e)
+
+
 class Parsar(object):
     """Parsar class"""
 
@@ -21,13 +59,13 @@ class Parsar(object):
 
     # pylint: disable=E1101
     def cpu(self, stats=DEFAULT_CPU_STATS):
-        return cparsar.parsefile(self.filename, CPU, stats, key='all')
+        return _try_parse(self.filename, CPU, stats, key='all')
 
     def mem(self, stats=DEFAULT_MEM_STATS):
-        return cparsar.parsefile(self.filename, MEM, stats)
+        return _try_parse(self.filename, MEM, stats)
 
     def disk(self, devname, stats=DEFAULT_DISK_STATS):
-        return cparsar.parsefile(self.filename, DISK, stats, key=devname)
+        return _try_parse(self.filename, DISK, stats, key=devname)
 
 
 def get_args():
@@ -68,4 +106,3 @@ def main():
     # TODO: Handle broken pipe (i.e., piping output into head)
     for r in result:
         print(r)
-

@@ -1,10 +1,44 @@
 from datetime import datetime, timedelta
 import os
+import sys
 
 
-class FileNotFound(Exception):
-    """Exception raised when sar file isn't found"""
-    pass
+ENOENT, EMEDIUMTYPE = range(-1, -3, -1)
+PY3 = sys.version_info[0] == 3
+
+##############################################################################
+# Copied from:
+# http://eli.thegreenplace.net/2011/10/19/perls-guess-if-file-is-text-or-binary-implemented-in-python
+##############################################################################
+
+# A function that takes an integer in the 8-bit range and returns
+# a single-character byte object in py3 / a single-character string
+# in py2.
+#
+int2byte = (lambda x: bytes((x,))) if PY3 else chr
+
+
+def istextfile(block):
+    """ Uses heuristics to guess whether the given file is text or binary,
+        by reading a single block of bytes from the file.
+        If more than 30% of the chars in the block are non-text, or there
+        are NUL ('\x00') bytes in the block, assume this is a binary file.
+    """
+    if b'\x00' in block:
+        # Files with null bytes are binary
+        return False
+    elif not block:
+        # An empty file is considered a valid text file
+        return True
+
+    _text_characters = (
+        b''.join(int2byte(i) for i in range(32, 127)) +
+        b'\n\r\t\f\b'
+    )
+    # Use translate's 'deletechars' argument to efficiently remove all
+    # occurrences of _text_characters from the block
+    nontext = block.translate(None, _text_characters)
+    return float(len(nontext)) / len(block) <= 0.30
 
 
 def parse_date(startdate_str):
@@ -35,7 +69,7 @@ def parsefile(filename, section, stats, key=''):
     headermap = None
 
     if not os.path.exists(filename):
-        raise FileNotFound('file "%s" does not exist' % filename)
+        return ENOENT
 
     def getstatsline():
         retstr = format_time(startdate, vals[0], vals[1])
@@ -49,6 +83,9 @@ def parsefile(filename, section, stats, key=''):
         retvals.append(headerstr)
 
         header = _file.readline()
+        if not istextfile(header[:512]):
+            return EMEDIUMTYPE
+
         header = header.split()
         startdate = parse_date(header[3])
         starttime = None
