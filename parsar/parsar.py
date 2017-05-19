@@ -5,12 +5,14 @@ from . import cparsar
 DEFAULT_CPU_STATS = ['%idle']
 DEFAULT_MEM_STATS = ['%memused']
 DEFAULT_DISK_STATS = ['tps']
+DEFAULT_NETDEV_STATS = ['rxpck/s', 'txpck/s']
 
 
 # Section identifiers
 CPU = 'CPU|%usr'
 MEM = 'kbmemfree|kbmemused'
 DISK = 'DEV|tps'
+NETDEV = 'IFACE|rxpck/s'
 
 
 class FileNotFound(Exception):
@@ -67,6 +69,9 @@ class Parsar(object):
     def disk(self, devname, stats=DEFAULT_DISK_STATS):
         return _try_parse(self.filename, DISK, stats, key=devname)
 
+    def netdev(self, devname, stats=DEFAULT_NETDEV_STATS):
+        return _try_parse(self.filename, NETDEV, stats, key=devname)
+
 
 def get_args():
     """get command line arguments"""
@@ -85,6 +90,12 @@ def get_args():
     subparser.add_argument('--diskstats', nargs='+',
                            help='default: %s' % DEFAULT_DISK_STATS[0])
 
+    subparser = subparsers.add_parser('netdev', help='Network device stats')
+    subparser.add_argument('--iface', required=True,
+                           help='desired network interface')
+    subparser.add_argument('--netstats', nargs='*',
+                           help='default: %s' % DEFAULT_NETDEV_STATS[0])
+
     parser.add_argument('filename', help='the SAR file to parse')
     return parser.parse_args()
 
@@ -102,6 +113,9 @@ def main():
     elif hasattr(args, 'diskstats'):
         stats = args.diskstats or DEFAULT_DISK_STATS
         result = p.disk(args.diskdev, stats=stats)
+    elif hasattr(args, 'netstats'):
+        stats = args.netstats or DEFAULT_NETDEV_STATS
+        result = p.netdev(args.iface, stats=stats)
 
     # TODO: Handle broken pipe (i.e., piping output into head)
     for r in result:
