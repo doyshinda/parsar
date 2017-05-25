@@ -6,6 +6,7 @@ DEFAULT_CPU_STATS = ['%idle']
 DEFAULT_MEM_STATS = ['%memused']
 DEFAULT_DISK_STATS = ['tps']
 DEFAULT_NETDEV_STATS = ['rxpck/s', 'txpck/s']
+DEFAULT_QUEUE_STATS = ['runq-sz']
 
 
 # Section identifiers
@@ -13,6 +14,7 @@ CPU = 'CPU|%usr'
 MEM = 'kbmemfree|kbmemused'
 DISK = 'DEV|tps'
 NETDEV = 'IFACE|rxpck/s'
+QUEUE = 'runq-sz|plist-sz'
 
 
 class FileNotFound(Exception):
@@ -72,6 +74,9 @@ class Parsar(object):
     def netdev(self, devname, stats=DEFAULT_NETDEV_STATS):
         return _try_parse(self.filename, NETDEV, stats, key=devname)
 
+    def queue(self, stats=DEFAULT_QUEUE_STATS):
+        return _try_parse(self.filename, QUEUE, stats)
+
 
 def get_args():
     """get command line arguments"""
@@ -96,6 +101,10 @@ def get_args():
     subparser.add_argument('--netstats', nargs='*',
                            help='default: %s' % DEFAULT_NETDEV_STATS[0])
 
+    subparser = subparsers.add_parser('queue',
+                                      help='Queue length and load stats')
+    subparser.add_argument('--queuestats', nargs='*')
+
     parser.add_argument('filename', help='the SAR file to parse')
     return parser.parse_args()
 
@@ -116,6 +125,9 @@ def main():
     elif hasattr(args, 'netstats'):
         stats = args.netstats or DEFAULT_NETDEV_STATS
         result = p.netdev(args.iface, stats=stats)
+    elif hasattr(args, 'queuestats'):
+        stats = args.queuestats or DEFAULT_QUEUE_STATS
+        result = p.queue(stats=stats)
 
     # TODO: Handle broken pipe (i.e., piping output into head)
     for r in result:
