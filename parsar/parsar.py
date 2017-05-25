@@ -7,6 +7,7 @@ DEFAULT_MEM_STATS = ['%memused']
 DEFAULT_DISK_STATS = ['tps']
 DEFAULT_NETDEV_STATS = ['rxpck/s', 'txpck/s']
 DEFAULT_QUEUE_STATS = ['runq-sz']
+DEFAULT_SWAP_STATS = ['%swpused']
 
 
 # Section identifiers
@@ -15,6 +16,7 @@ MEM = 'kbmemfree|kbmemused'
 DISK = 'DEV|tps'
 NETDEV = 'IFACE|rxpck/s'
 QUEUE = 'runq-sz|plist-sz'
+SWAP = 'kbswpfree|kbswpused'
 
 
 class FileNotFound(Exception):
@@ -77,6 +79,9 @@ class Parsar(object):
     def queue(self, stats=DEFAULT_QUEUE_STATS):
         return _try_parse(self.filename, QUEUE, stats)
 
+    def swap(self, stats=DEFAULT_SWAP_STATS):
+        return _try_parse(self.filename, SWAP, stats)
+
 
 def get_args():
     """get command line arguments"""
@@ -105,6 +110,9 @@ def get_args():
                                       help='Queue length and load stats')
     subparser.add_argument('--queuestats', nargs='*')
 
+    subparser = subparsers.add_parser('swap', help='Swap space stats')
+    subparser.add_argument('--swapstats', nargs='*')
+
     parser.add_argument('filename', help='the SAR file to parse')
     return parser.parse_args()
 
@@ -128,6 +136,9 @@ def main():
     elif hasattr(args, 'queuestats'):
         stats = args.queuestats or DEFAULT_QUEUE_STATS
         result = p.queue(stats=stats)
+    elif hasattr(args, 'swapstats'):
+        stats = args.swapstats or DEFAULT_SWAP_STATS
+        result = p.swap(stats=stats)
 
     # TODO: Handle broken pipe (i.e., piping output into head)
     for r in result:
