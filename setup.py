@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='parsar',
     packages=['parsar'],
-    version='0.1.7',
+    version='0.2.0',
     description='Python SAR data parser',
     author='Abe Friesen',
     author_email='abefriesen.af@gmail.com',
@@ -12,7 +12,7 @@ setup(
 
     keywords=['sar'],
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
 
