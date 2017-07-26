@@ -1,15 +1,13 @@
-.PHONY: local build push
+.PHONY: local build push pushtest
 
 local: build
 	@sudo pip2.7 install -e .
 
-build: cythonize
+build:
 	@python2.7 setup.py sdist
 
-cythonize:
-	@make -C parsar/
-
 pushtest: build
-	@cp dist/* ../parsar-archive/
-	@rm -f dist/*
 	@twine upload -r pypitest dist/*
+
+pushprod: build
+	@twine upload -r pypi dist/*
