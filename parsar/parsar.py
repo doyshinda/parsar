@@ -1,4 +1,5 @@
 import argparse
+import errno
 from . import cparsar
 
 
@@ -140,6 +141,11 @@ def main():
         stats = args.swapstats or DEFAULT_SWAP_STATS
         result = p.swap(stats=stats)
 
-    # TODO: Handle broken pipe (i.e., piping output into head)
-    for r in result:
-        print(r)
+    try:
+        for r in result:
+            print(r)
+    except IOError as e:
+        if e.errno == errno.EPIPE:
+            pass
+        else:
+            raise e
