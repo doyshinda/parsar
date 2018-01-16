@@ -89,6 +89,7 @@ def parsefile(filename, section, stats, key=''):
         header = header.split()
         startdate = parse_date(header[3])
         starttime = None
+        starthour = None
 
         key1, key2 = section.split('|')
         pm = False
@@ -114,10 +115,11 @@ def parsefile(filename, section, stats, key=''):
 
             if not starttime:
                 starttime = vals[0]
+                starthour = vals[1]
                 headermap = {n: idx for (idx, n) in enumerate(vals)}
                 continue
 
-            if vals[0] == starttime and len(retvals) > 2:
+            if vals[0] == starttime and vals[1] == starthour and len(retvals) > 2:
                 return retvals
 
             if starttime:
