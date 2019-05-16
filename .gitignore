@@ -5,4 +5,4 @@ cparsar.c
 build
 dist
 parsar.egg-info
-
+MANIFEST*

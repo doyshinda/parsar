@@ -43,7 +43,7 @@ def istextfile(block):
 
 def parse_date(startdate_str):
     """parse the date SAR collection started"""
-    formats = ['%y-%m-%d', '%Y-%m-%d', '%m/%d/%y']
+    formats = ['%y-%m-%d', '%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y']
     for fmt in formats:
         try:
             startdate = datetime.strptime(startdate_str, fmt)
